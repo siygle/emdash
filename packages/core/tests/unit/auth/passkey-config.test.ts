@@ -1,4 +1,4 @@
-import { describe, it, expect } from "vitest";
+import { describe, it, expect, afterEach } from "vitest";
 
 import { getPasskeyConfig } from "../../../src/auth/passkey-config.js";
 
@@ -77,6 +77,46 @@ describe("passkey-config", () => {
 			// Standard https port 443 is omitted from origin
 			expect(config.origin).toBe("https://example.com");
 			expect(config.rpId).toBe("example.com");
+		});
+	});
+
+	describe("ORIGIN env var override", () => {
+		afterEach(() => {
+			delete process.env.ORIGIN;
+		});
+
+		it("uses ORIGIN env var over request URL when set", () => {
+			process.env.ORIGIN = "https://cms.example.com";
+			const url = new URL("http://localhost:4321/admin");
+			const config = getPasskeyConfig(url);
+
+			expect(config.rpId).toBe("cms.example.com");
+			expect(config.origin).toBe("https://cms.example.com");
+		});
+
+		it("uses ORIGIN env var for rpName when no siteName provided", () => {
+			process.env.ORIGIN = "https://cms.example.com";
+			const url = new URL("http://localhost:4321/admin");
+			const config = getPasskeyConfig(url);
+
+			expect(config.rpName).toBe("cms.example.com");
+		});
+
+		it("uses siteName for rpName even with ORIGIN env var", () => {
+			process.env.ORIGIN = "https://cms.example.com";
+			const url = new URL("http://localhost:4321/admin");
+			const config = getPasskeyConfig(url, "My Site");
+
+			expect(config.rpName).toBe("My Site");
+			expect(config.rpId).toBe("cms.example.com");
+		});
+
+		it("falls back to request URL when ORIGIN is not set", () => {
+			const url = new URL("http://localhost:4321/admin");
+			const config = getPasskeyConfig(url);
+
+			expect(config.rpId).toBe("localhost");
+			expect(config.origin).toBe("http://localhost:4321");
 		});
 	});
 });
