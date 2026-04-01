@@ -12,8 +12,9 @@ FROM base AS build
 # Copy template files
 COPY docker/template/ .
 
-# Install dependencies
-RUN pnpm install --frozen-lockfile 2>/dev/null || pnpm install
+# Install dependencies (shamefully-hoist for runtime compatibility
+# since Astro SSR require()s transitive deps like kysely, got)
+RUN pnpm install --shamefully-hoist
 
 # Initialize database and seed demo content
 RUN pnpm run bootstrap
@@ -26,7 +27,8 @@ FROM base AS runtime
 
 WORKDIR /app
 
-# Copy built output and dependencies
+# Copy built output and full node_modules (Astro SSR requires
+# runtime deps like kysely, better-sqlite3, got that aren't bundled)
 COPY --from=build /app/dist ./dist
 COPY --from=build /app/node_modules ./node_modules
 COPY --from=build /app/package.json ./
