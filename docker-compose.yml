@@ -1,0 +1,19 @@
+services:
+  emdash:
+    build:
+      context: .
+      dockerfile: docker/Dockerfile
+    ports:
+      - "${EMDASH_PORT:-4321}:4321"
+    volumes:
+      # Persistent data: SQLite database and uploaded media
+      - emdash-data:/app/data
+      - emdash-uploads:/app/uploads
+    environment:
+      - HOST=0.0.0.0
+      - PORT=4321
+    restart: unless-stopped
+
+volumes:
+  emdash-data:
+  emdash-uploads:
