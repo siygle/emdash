@@ -15,7 +15,7 @@ services:
       # ORIGIN must match how you access the site in browser
       # Required for passkey/WebAuthn registration to work
       # Examples: http://localhost:4321, https://cms.example.com
-      - ORIGIN=${ORIGIN:-http://localhost:4321}
+      - ORIGIN=${ORIGIN:-https://wp.sylee.dev}
     restart: unless-stopped
 
 volumes:
