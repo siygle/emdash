@@ -18,6 +18,18 @@ Open http://localhost:4321 — the blog comes pre-seeded with demo content.
 EMDASH_PORT=8080 docker compose up -d
 ```
 
+### Public URL (required for passkey setup)
+
+The `ORIGIN` must match the URL you use in the browser. Passkey/WebAuthn **does not work with IP addresses** — use `localhost` or a domain name.
+
+```bash
+# Local access (default)
+ORIGIN=http://localhost:4321 docker compose up -d
+
+# Behind a reverse proxy with domain
+ORIGIN=https://cms.example.com docker compose up -d
+```
+
 ### Data Persistence
 
 Data is stored in Docker volumes:

@@ -6,6 +6,9 @@ import emdash, { local } from "emdash/astro";
 import { sqlite } from "emdash/db";
 
 export default defineConfig({
+	// ORIGIN env var sets the public URL for passkey/WebAuthn to work correctly
+	// e.g. https://cms.example.com or http://localhost:4321
+	...(process.env.ORIGIN ? { site: process.env.ORIGIN } : {}),
 	output: "server",
 	adapter: node({
 		mode: "standalone",
